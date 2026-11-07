@@ -1,34 +1,42 @@
-version: '2'
 services:
   api:
     build: .
     container_name: api
-    command: bash -c "cd /src/rest && python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    working_dir: /src/rest
+    environment:
+      DJANGO_DEBUG: 'true'
+      MONGO_HOST: mongo
+      MONGO_PORT: '27017'
     ports:
-      - "8000:8000"
-    links:
+      - '8000:8000'
+    depends_on:
       - mongo
     volumes:
-      - ${ADBREW_CODEBASE_PATH}/tmp:/tmp
       - ${ADBREW_CODEBASE_PATH}:/src
 
   app:
-    build: .
+    image: node:16-bullseye
     container_name: app
-    command: bash -c "cd /src/app && yarn install && yarn start"
+    command: bash -c "yarn install --frozen-lockfile && yarn start"
+    working_dir: /src/app
+    environment:
+      HOST: 0.0.0.0
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ${ADBREW_CODEBASE_PATH}:/src
+      - node_modules:/src/app/node_modules
 
   mongo:
-    build: .
+    image: mongo:4.4
     container_name: mongo
     restart: always
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
-      - ${ADBREW_CODEBASE_PATH}/db/:/data/db
-    command: /usr/bin/mongod --bind_ip 0.0.0.0
+      - mongo_data:/data/db
 
-    
+volumes:
+  node_modules:
+  mongo_data:

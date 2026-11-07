@@ -1,0 +1,8 @@
+.git
+**/__pycache__
+**/*.pyc
+src/app/node_modules
+src/app/build
+src/app/.eslintcache
+src/db
+src/tmp

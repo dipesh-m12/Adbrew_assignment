@@ -10,23 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
-from datetime import timedelta
-import sys, os
-from corsheaders.defaults import default_headers
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-print( "base dir path", BASE_DIR)
-sys.path.append(os.path.join(BASE_DIR, ".."))
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+from django.core.exceptions import ImproperlyConfigured
 
-SECRET_KEY = '00000000000000000000000000000000000000000000000000'
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() == 'true'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'development-only-secret-key'
+    else:
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when debug is off')
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,api').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -77,12 +78,7 @@ WSGI_APPLICATION = 'rest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
-    }
-}
+DATABASES = {}
 
 
 # Password validation
@@ -131,6 +127,11 @@ REST_FRAMEWORK = {
 }
 
 
-CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    origin.strip()
+    for origin in os.environ.get(
+        'CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
+    ).split(',')
+    if origin.strip()
+]
 
