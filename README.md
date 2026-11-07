@@ -17,21 +17,23 @@ We highly recommend you go through the setup in `Dockerfile` and `docker-compose
 # Setup
 1. Clone this repository (DO NOT FORK)
 ```
-git clone https://github.com/adbrew/test.git
+git clone https://github.com/dipesh-m12/Adbrew_assignment.git
+cd Adbrew_assignment
 ```
-2. Change into the cloned directory and set the environment variable for the code path. Replace `path_to_repository` appropriately.
+2. Set the environment variable for the source directory.
 ```
-export ADBREW_CODEBASE_PATH="{path_to_repository}/test/src"
+export ADBREW_CODEBASE_PATH="$(pwd)/src"
 ```
+In PowerShell, use `$env:ADBREW_CODEBASE_PATH = (Resolve-Path .\src).Path` instead.
 3. Build container (you only need to build containers for the first time or if you change image definition, i.e., `Dockerfile`). This step will take a good amount of time.
 ```
-docker-compose build
+docker compose build
 ```
 4. Once the build is completed, start the containers:
 ```
-docker-compose up -d
+docker compose up -d
 ```
-5. Once complete, `docker ps` should output something like this:
+5. Once complete, `docker compose ps` should show the `api`, `app`, and `mongo` services running. The image names in the historical example below differ from this solution's Compose file:
 ```
 CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS                      NAMES
 e445be7efa61   adbrew_test_api     "bash -c 'cd /src/re…"   3 minutes ago   Up 2 seconds   0.0.0.0:8000->8000/tcp     api
@@ -44,7 +46,7 @@ e445be7efa61   adbrew_test_api     "bash -c 'cd /src/re…"   3 minutes ago   Up
 # Tips
 1. Once containers are up and running, you can view container logs by executing `docker logs -f --tail=100 {container_name}` Replace `container_name` with `app` or `api`(output of `docker ps`)
 2. You can enter the container and inspect it by executing `docker exec -it {container_name} bash` Replace `{container_name}` with `app` or `api` (output of `docker ps`)
-3. Shut all containers using `docker-compose down`
+3. Shut all containers using `docker compose down`
 4. Restart a container using `docker restart {container_name}`
 
 
